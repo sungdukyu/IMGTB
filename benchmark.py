@@ -68,6 +68,9 @@ def main():
     
     print_w_sep_line("Finish", config["global"]["interactive"])
                    
+    # Sungduk
+    print_command_line()
+
 def run_benchmark(dataset_dict, config):
     
     available_experiments = scan_for_detection_methods()    
@@ -167,7 +170,7 @@ def log_whole_experiment(config, outputs):
     
     # Write args to file.
     with open(os.path.join(LOG_PATH, "config.json"), "w") as file:
-        json.dump(config, file, indent=4)
+        json.dump(hide_sensitive_info(config), file, indent=4)
         
     # Save outputs.
     outputs = convert_to_serializable(outputs)
@@ -194,7 +197,7 @@ def save_method_dataset_combination_results(methods_config, outputs):
                    f" on {dataset_name} dataset to absolute path: {os.path.abspath(SAVE_PATH)}")
             if not os.path.exists(SAVE_PATH):
                 os.makedirs(SAVE_PATH)
-            data = {"config": method_config, "data": method_results}
+            data = {"config": hide_sensitive_info(method_config), "data": method_results}
             # Save args and outputs for given method and dataset.
             data = convert_to_serializable(data)
             with open(os.path.join(SAVE_PATH, f"{CURR_DATETIME}_experiment_results.json"), "w") as file:
@@ -209,6 +212,23 @@ def print_w_sep_line(text: str, is_interactive=True) -> None:
     print('-' * width)
     print(text)
     
+def print_command_line():
+    command_line = 'python ' + ' '.join(sys.argv)
+    print(f"Command line used: {command_line}")
+
+    # Write the command line to the text file
+    f_cmd = os.path.join(LOG_PATH, 'command_line.txt')
+    with open(f_cmd, 'w') as file:
+        file.write(command_line)
+
+def hide_sensitive_info(d, keys_to_hide=['api_key', 'apikey']):
+    # redundanty safey measure to prevent any sensitive info from being logged
+    for k, v in d.items():
+        if isinstance(v, dict):
+            hide_sensitive_info(v, keys_to_hide)
+        elif any(key in k.lower() for key in keys_to_hide):
+            d[k] = '(hidden)'
+    return d
 
 if __name__ == '__main__':
     main()
