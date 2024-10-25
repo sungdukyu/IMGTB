@@ -19,10 +19,13 @@ class AnchorEmbedding(MetricBasedExperiment):
         # set up a client
         if self.is_openai_model():
             # (Make sure to configure api key and endpoint correctly)
-            self.config['openai_key'] = os.getenv("AZURE_OPENAI_API_KEY_2")
-            self.config['openai_endpoint'] = os.getenv("AZURE_OPENAI_API_BASE_2")
-            self.client = AzureOpenAI(api_key = self.config['openai_key'],
-                                      azure_endpoint = self.config['openai_endpoint'],
+            # do not put openai_key and openai_endpoint. this can cause 2 problems.
+            # 1. security issue. At the end of run, all config will dump to a json file.
+            # 2. openai resource conflict. openai api is used in different methods, but they are not necessarily using the same key and endpoint.
+            _openai_key = os.getenv("AZURE_OPENAI_API_KEY_2")
+            _openai_endpoint = os.getenv("AZURE_OPENAI_API_BASE_2")
+            self.client = AzureOpenAI(api_key = _openai_key,
+                                      azure_endpoint = _openai_endpoint,
                                       api_version="2024-06-01",
                                       http_client = httpx.Client(verify=False),
                                       )
