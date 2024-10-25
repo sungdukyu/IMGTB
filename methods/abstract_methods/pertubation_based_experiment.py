@@ -15,7 +15,7 @@ FILL_DICTIONARY = set()
 
 class PertubationBasedExperiment(MetricBasedExperiment):
      def __init__(self, data, name, config): # Add extra parameters if needed
-        super().__init__(data, name)
+        super().__init__(data, name, config)
         self.base_model_name = config["base_model_name"]
         self.cache_dir = config["cache_dir"]
         self.DEVICE = config["DEVICE"]
@@ -31,6 +31,8 @@ class PertubationBasedExperiment(MetricBasedExperiment):
      @timeit
      def run(self):
         self.start_time = time.time()
+        
+        print(f"<<< Running {self.name} experiment >>>")
         
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
@@ -167,7 +169,7 @@ class PertubationBasedExperiment(MetricBasedExperiment):
             #x_test = np.expand_dims(x_test, axis=-1)
             y_test = [_['label'] for _ in results['test']]
 
-            train_pred, test_pred, train_pred_prob, test_pred_prob, train_res, test_res = self.get_clf_results(x_train, y_train, x_test, y_test, config=self.config)
+            train_pred, test_pred, train_pred_prob, test_pred_prob, train_res, test_res = self.get_clf_results(x_train, y_train, x_test, y_test)
             acc_train, precision_train, recall_train, f1_train, auc_train, specificity_train = train_res
             acc_test, precision_test, recall_test, f1_test, auc_test, specificity_test = test_res
 
