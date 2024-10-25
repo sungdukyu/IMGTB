@@ -8,6 +8,17 @@ from pathlib import Path
 from itertools import zip_longest
 from sklearn.model_selection import train_test_split
 from math import floor
+from lib.custom_dataset_loader import (process_custom_mini,
+                                       process_train_iclr2022_gpt_4o_test_iclr2021_gpt4o,
+                                       process_train_iclr2022_gpt_4o_test_iclr2022_gpt4o,
+                                       process_train_iclr2022_gpt_4o_test_iclr2023_gpt4o,
+                                       process_train_iclr2022_gpt_4o_test_iclr2024_gpt4o,
+                                       process_train_iclr2022_gpt_4o_test_iclr2021_llama3,
+                                       process_train_iclr2022_gpt_4o_test_iclr2022_llama3,
+                                       process_train_iclr2022_gpt_4o_test_iclr2023_llama3,
+                                       process_train_iclr2022_gpt_4o_test_iclr2024_llama3,
+                                       process_train_iclr2022_gpt_4o_test_iclr2022_gpt4o_with_anchor,
+                                       )
 
 """ 
     This module provides functionality for loading datasets
@@ -28,6 +39,7 @@ SUPPORTED_FILETYPES = ["auto", "csv", "tsv", "xls", "xlsx", "json", "jsonl", "xm
 DEFAULT_TEXT_FIELD_NAME = "text"
 DEFAULT_LABEL_FIELD_NAME = "label"
 
+CUSTOM_DATASET_FPATH = 'custom'
 
 def load_multiple_from_file(datasets_params, is_interactive: bool):
     unified_data_dict = dict()
@@ -48,6 +60,14 @@ def read_multiple_to_pandas(datasets_params, is_interactive: bool) -> Dict[str, 
     seen = dict()
     for dataset_params in datasets_params:
         filepath, filetype = dataset_params["filepath"], dataset_params["filetype"]
+
+        # [SY] Custom dataset.
+        #      Just need to register the dataset name. Processor functions read data from hard-wired files directly.
+        if filepath == CUSTOM_DATASET_FPATH:
+            _dataset_name = dataset_params['processor'] # dataset_params['processor'] are the dataset name parsed by "config.py"
+            datasets[_dataset_name] = {}
+            continue
+
         read_dataset_to_pandas = read_dir_to_pandas if Path(filepath).is_dir() else read_file_to_pandas
         while (df_dict := read_dataset_to_pandas(filepath=filepath, filetype=filetype, is_interactive=is_interactive, config=dataset_params)) is None:
             if is_interactive:
