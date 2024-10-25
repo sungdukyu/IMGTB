@@ -110,6 +110,8 @@ class MetricBasedExperiment(Experiment):
     def run(self):
         start_time = time.time()
         
+        print(f"<<< Running {self.name} experiment >>>")
+
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
         print(f"Using cache dir {self.cache_dir}")
