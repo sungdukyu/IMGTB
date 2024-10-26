@@ -45,7 +45,7 @@ class DNAGPT(MetricBasedExperiment):
         self.openai_key = config.get("openai_key", None) ### OpenAI AIP key for access to the re-generation service, users are suggested to delete the key after usage to avoid potential leakage of key
         if self.openai_key is not None:
             openai.api_key = self.openai_key
-        self.model_name = config.get("model_name", "")
+        self.model_name = config.get("base_model_name", "")
         self.temperature = config.get("temperature", 0.7)  ### This parameter controls text quality of chatgpt, by default it was set to 0.7 in the website version of ChatGPT.
         self.max_new_tokens = config.get("max_new_tokens", 300) ### maximum length of generated texts from chatgpt
         self.regen_number = config.get("regen_number", 30)  ### for faster response, users can set this value to smaller ones, such as 20 or 10, which will degenerate performance a little bit
@@ -53,9 +53,10 @@ class DNAGPT(MetricBasedExperiment):
         self.truncate_ratio = config.get("truncate_ratio", 0.5)
         self.scoring_function = config.get("scoring_function", "blackbox") # options are ["blackbox", "whitebox"]
         self.PorterStemmer = PorterStemmer()
-        self.DEVICE = config["DEVICE"]
-        self.model = transformers.AutoModelForCausalLM.from_pretrained(self.model_name).to(self.DEVICE)
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_name)
+        if self.openai_key is None:
+            self.DEVICE = config["DEVICE"]
+            self.model = transformers.AutoModelForCausalLM.from_pretrained(self.model_name).to(self.DEVICE)
+            self.tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_name)
 
         
         # Remember to specify threshold or threshold_estimation_params (see methods/abstract_methods/metric_based_experiment.py)
