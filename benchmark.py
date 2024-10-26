@@ -221,7 +221,7 @@ def print_command_line():
     with open(f_cmd, 'w') as file:
         file.write(command_line)
 
-def hide_sensitive_info(d, keys_to_hide=['api_key', 'apikey']):
+def hide_sensitive_info(d, keys_to_hide=['api_key', 'apikey', 'openai_key', 'openaikey']):
     # redundanty safey measure to prevent any sensitive info from being logged
     for k, v in d.items():
         if isinstance(v, dict):
