@@ -8,6 +8,8 @@ from inspect import getmembers, getmodule, isclass
 import importlib.util
 import traceback
 import time
+import uuid
+import hashlib
  
 from lib.dataset_loader import load_multiple_from_file
 from lib.config import get_config
@@ -19,7 +21,8 @@ from results_analysis import run_full_analysis, list_available_analysis_methods
 CURR_DATETIME = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
 METHODS_DIRECTORY = "methods/implemented_methods"
 RESULTS_PATH = "results"
-LOG_PATH = os.path.join(RESULTS_PATH, "logs", CURR_DATETIME)
+hash_value = hashlib.md5((CURR_DATETIME + uuid.uuid4().hex).encode()).hexdigest()[:6]
+LOG_PATH = os.path.join(RESULTS_PATH, "logs", f"{CURR_DATETIME}-{hash_value}")
 LOG_METHOD_W_DATASET_PATH = os.path.join(RESULTS_PATH, "methods")
 DATASETS_PATH = "datasets"
 
@@ -200,7 +203,7 @@ def save_method_dataset_combination_results(methods_config, outputs):
             data = {"config": hide_sensitive_info(method_config), "data": method_results}
             # Save args and outputs for given method and dataset.
             data = convert_to_serializable(data)
-            with open(os.path.join(SAVE_PATH, f"{CURR_DATETIME}_experiment_results.json"), "w") as file:
+            with open(os.path.join(SAVE_PATH, f"{CURR_DATETIME}-{hash_value}_experiment_results.json"), "w") as file:
                 json.dump(data, file)
 
 
